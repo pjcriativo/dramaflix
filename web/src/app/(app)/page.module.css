@@ -9,3 +9,285 @@
     margin-top: 8px;
   }
 }
+
+/* Container "All Series" SnapReels (Card arredondado escuro com grade de séries) */
+.allSeriesSection {
+  margin: 48px auto;
+  max-width: 1440px;
+  padding: 0 var(--gutter, 24px);
+}
+
+.allSeriesContainer {
+  background: #111116;
+  border: 1px solid #1e1e28;
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+.allSeriesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.allSeriesHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.allSeriesIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid #ec1c5b;
+  display: grid;
+  place-items: center;
+  color: #ec1c5b;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.allSeriesTitle {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.allSeriesSubtitle {
+  font-size: 0.8rem;
+  color: #71717a;
+  margin-top: 2px;
+}
+
+.allSeriesGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .allSeriesGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .allSeriesGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .allSeriesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+.allSeriesFooter {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.btnCatalogFull {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #181820;
+  border: 1px solid #2a2a38;
+  color: #e4e4e7;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btnCatalogFull:hover {
+  background: #22222e;
+  border-color: #3b3b4e;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Rodapé SnapReels */
+.snapFooter {
+  border-top: 1px solid #1a1a24;
+  background: #09090d;
+  margin-top: 64px;
+  padding: 48px var(--gutter, 24px) 32px;
+  color: #888899;
+}
+
+.footerContent {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.footerTop {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-bottom: 36px;
+}
+
+@media (max-width: 900px) {
+  .footerTop {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+.brandSnap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.brandLogoBox {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ec1c5b 0%, #ff4b72 100%);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.brandName {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.footerTagline {
+  font-size: 0.85rem;
+  color: #71717a;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.footerCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .footerCenter {
+    align-items: flex-start;
+  }
+}
+
+.footerLinksRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.footerLink {
+  color: #888899;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footerLink:hover {
+  color: #ffffff;
+}
+
+.footerLinkRed {
+  color: #ec1c5b;
+}
+
+.footerLinkRed:hover {
+  color: #ff6b8b;
+}
+
+.socialRow {
+  display: flex;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.socialIconBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #14141c;
+  border: 1px solid #222230;
+  display: grid;
+  place-items: center;
+  color: #888899;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.socialIconBtn:hover {
+  background: #20202c;
+  color: #ffffff;
+  border-color: #333346;
+}
+
+.footerAppsTitle {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #aaaabb;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+
+.appBadges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mockAppBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #14141c;
+  border: 1px solid #222230;
+  padding: 6px 14px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.78rem;
+  cursor: pointer;
+  width: fit-content;
+  transition: all 0.15s ease;
+}
+
+.mockAppBadge:hover {
+  background: #1c1c28;
+  border-color: #333348;
+}
+
+.footerBottom {
+  border-top: 1px solid #14141c;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.72rem;
+  color: #555566;
+}

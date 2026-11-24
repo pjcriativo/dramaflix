@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { type Drama, type Progresso, rotuloSelo } from "@/data/catalogo";
+import { alternarLista, useMinhaLista } from "@/lib/estado";
 import { cx } from "@/lib/marca";
 import { rotaAssistir } from "@/lib/rotas";
 import { useApp } from "./AppProvider";
-import { IconEpisodios, IconPlay } from "./icons";
+import { IconBookmark, IconEpisodios, IconPlay } from "./icons";
 import styles from "./PosterCard.module.css";
 
 interface Props {
@@ -23,9 +24,11 @@ interface Props {
 
 const SIZES = "(min-width: 1900px) 300px, (min-width: 960px) 24vw, (min-width: 560px) 32vw, 46vw";
 
-/** Capa 3:4 com o número de episódios e selos aplicados pela interface. Embaixo, só o título. */
+/** Capa 3:4 SnapReels com VIP badge no canto superior esquerdo e botão de bookmark no canto superior direito. */
 export function PosterCard({ drama: d, variante = "padrao", progresso, mostrarTop, layout = "fileira", sizes = SIZES }: Props) {
   const { abrirModal } = useApp();
+  const { ids: lista } = useMinhaLista();
+  const salvo = lista.includes(d.id);
   const continuar = variante === "continuar" && progresso;
 
   const arte = (
@@ -33,7 +36,30 @@ export function PosterCard({ drama: d, variante = "padrao", progresso, mostrarTo
       <Image src={d.capa} alt="" fill sizes={sizes} className={styles.img} />
       <span className={styles.sombra} aria-hidden="true" />
 
-      {!continuar && d.selo && <span className={cx(styles.selo, styles[d.selo])}>{rotuloSelo[d.selo]}</span>}
+      {/* Selo VIP SnapReels ou selo específico da série */}
+      {!continuar && (
+        <span className={styles.vipBadge}>
+          {d.selo ? rotuloSelo[d.selo] : "VIP"}
+        </span>
+      )}
+
+      {/* Botão de Salvar / Favorito no canto superior direito */}
+      {!continuar && (
+        <button
+          type="button"
+          className={cx(styles.bookmarkBtn, salvo && styles.bookmarkBtnSalvo)}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            alternarLista(d.id);
+          }}
+          aria-label={salvo ? "Remover dos favoritos" : "Salvar nos favoritos"}
+          title={salvo ? "Salvo nos favoritos" : "Salvar nos favoritos"}
+        >
+          <IconBookmark size={15} />
+        </button>
+      )}
+
       {mostrarTop && d.emAlta <= 10 && (
         <span className={styles.top} aria-hidden="true">
           <small>TOP</small>10

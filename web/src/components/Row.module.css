@@ -15,6 +15,21 @@
   margin-bottom: 12px;
 }
 
+.tituloBloco {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.subtitulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #71717a;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .titulo {
   min-width: 0;
   display: flex;

@@ -130,8 +130,8 @@ export function Billboard() {
             <p className={styles.sinopse}>{d.gancho}</p>
 
             <div className={styles.acoes}>
-              <Botao href={rotaAssistir(d.id, 1)} variante="claro" tamanho="g" icone={<IconPlay size={22} />} className={styles.bb}>
-                Assistir
+              <Botao href={rotaAssistir(d.id, 1)} variante="destaque" tamanho="g" icone={<IconPlay size={22} />} className={styles.bb}>
+                Assistir Agora
               </Botao>
               <Botao variante="neutro" tamanho="g" icone={<IconInfo size={22} />} onClick={() => abrirModal(d.id)} className={styles.bb}>
                 Detalhes
@@ -153,7 +153,7 @@ export function Billboard() {
                 {naLista ? <IconCheck size={26} /> : <IconPlus size={26} />}
                 <span>Minha lista</span>
               </button>
-              <Botao href={rotaAssistir(d.id, 1)} variante="claro" tamanho="m" icone={<IconPlay size={20} />}>
+              <Botao href={rotaAssistir(d.id, 1)} variante="destaque" tamanho="m" icone={<IconPlay size={20} />}>
                 Assistir
               </Botao>
               <button className={styles.lateral} onClick={() => abrirModal(d.id)}>

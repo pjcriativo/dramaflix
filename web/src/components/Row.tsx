@@ -76,13 +76,28 @@ function Trilho({ fileira, itens, historico }: { fileira: Fileira; itens: string
   const top = fileira.tipo === "top";
   const Icone = iconeDe[fileira.id];
 
+  const subtitulos: Record<string, string> = {
+    novos: "HAND-PICKED BY OUR EDITORS",
+    "em-alta": "TOP TRENDING SHORT DRAMAS",
+    dinheiro: "POWER, MONEY & CEO REVENGE",
+    vinganca: "REVENGE & DRAMATIC COMEBACKS",
+    suspense: "THRILLER, ACTION & MYSTERY",
+    leve: "SWEET ROMANCE & COMEDY",
+    maratonar: "BINGE-WORTHY COMPLETE SERIES",
+  };
+
   return (
     <section ref={secaoRef} className={styles.row} id={fileira.id} aria-labelledby={tituloId}>
       <div className={styles.cab}>
-        <h2 id={tituloId} className={styles.titulo}>
-          {Icone && <Icone size={26} className={styles.iconeTitulo} />}
-          <span>{fileira.titulo}</span>
-        </h2>
+        <div className={styles.tituloBloco}>
+          <h2 id={tituloId} className={styles.titulo}>
+            {Icone && <Icone size={24} className={styles.iconeTitulo} />}
+            <span>{fileira.titulo}</span>
+          </h2>
+          {subtitulos[fileira.id] && (
+            <span className={styles.subtitulo}>{subtitulos[fileira.id]}</span>
+          )}
+        </div>
         <div className={styles.ferramentas}>
           {fileira.verTudo && (
             <Link href={fileira.verTudo} className={styles.verTudo}>
