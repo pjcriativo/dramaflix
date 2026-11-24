@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { AppProvider } from "@/components/AppProvider";
 import { TitleModal } from "@/components/TitleModal";
 import { Toast } from "@/components/Toast";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { MARCA } from "@/lib/marca";
 import "./globals.css";
 
@@ -32,11 +33,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={inter.variable}>
       <body>
-        <AppProvider>
-          {children}
-          <TitleModal />
-          <Toast />
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            {children}
+            <TitleModal />
+            <Toast />
+          </AppProvider>
+        </AuthProvider>
       </body>
     </html>
   );

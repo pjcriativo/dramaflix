@@ -1,0 +1,156 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  role          String    @default("USER") // "USER" ou "ADMIN"
+  coinsBalance  Int       @default(120)
+  isVip         Boolean   @default(false)
+  vipPlan       String?   // "semanal", "mensal", "anual"
+  vipExpiresAt  DateTime?
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  unlocks       EpisodeUnlock[]
+  history       WatchHistory[]
+  favorites     Favorite[]
+  likes         Like[]
+  transactions  Transaction[]
+
+  @@map("users")
+}
+
+model Drama {
+  id                String    @id // ex: "ele-me-trocou"
+  numero            Int       @default(0)
+  titulo            String
+  genero            String
+  sinopse           String
+  gancho            String
+  episodiosTotal    Int       @default(1)
+  gratisAte         Int       @default(10)
+  moedasPorEpisodio Int       @default(40)
+  classificacao     String    @default("A14") // L, A10, A12, A14, A16, A18
+  selo              String?   // novo, exclusivo, dublado, completo
+  dublado           Boolean   @default(false)
+  emAlta            Int       @default(0)
+  capa              String    // ex: "/capas/01-ele-me-trocou.webp"
+  foto              String    // ex: "/fotos/01-ele-me-trocou.webp"
+  banner            String    // ex: "/banners/01-ele-me-trocou.webp"
+  logo              String?   // ex: "/logos/01-ele-me-trocou.webp"
+  logoWidth         Int       @default(1000)
+  logoHeight        Int       @default(500)
+  cor               String    @default("#14100d")
+  tags              String    // JSON string array ou palavras-chave
+  amostraVideo      String?   // ex: "/videos/ele-me-trocou/amostra.mp4"
+  previaVideo       String?   // ex: "/videos/ele-me-trocou/previa.mp4"
+  ativo             Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  episodios         Episode[]
+  unlocks           EpisodeUnlock[]
+  history           WatchHistory[]
+  favorites         Favorite[]
+  likes             Like[]
+
+  @@map("dramas")
+}
+
+model Episode {
+  id              String    @id @default(cuid())
+  dramaId         String
+  numero          Int
+  titulo          String?
+  videoUrl        String    // ex: "/videos/casei-com-o-mendigo/ep-001.mp4"
+  duracaoSegundos Int       @default(90)
+  gratis          Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  drama           Drama     @relation(fields: [dramaId], references: [id], onDelete: Cascade)
+
+  @@unique([dramaId, numero])
+  @@map("episodes")
+}
+
+model EpisodeUnlock {
+  id              String    @id @default(cuid())
+  userId          String
+  dramaId         String
+  numeroEpisodio  Int
+  moedasGastas    Int       @default(0)
+  criadoEm        DateTime  @default(now())
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drama           Drama     @relation(fields: [dramaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dramaId, numeroEpisodio])
+  @@map("episode_unlocks")
+}
+
+model WatchHistory {
+  id              String    @id @default(cuid())
+  userId          String
+  dramaId         String
+  numeroEpisodio  Int
+  segundos        Float     @default(0)
+  atualizadoEm    DateTime  @updatedAt
+
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drama           Drama     @relation(fields: [dramaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dramaId])
+  @@map("watch_history")
+}
+
+model Favorite {
+  id        String    @id @default(cuid())
+  userId    String
+  dramaId   String
+  criadoEm  DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drama     Drama     @relation(fields: [dramaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dramaId])
+  @@map("favorites")
+}
+
+model Like {
+  id        String    @id @default(cuid())
+  userId    String
+  dramaId   String
+  criadoEm  DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  drama     Drama     @relation(fields: [dramaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dramaId])
+  @@map("likes")
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  userId      String
+  tipo        String    // "RECARGA_MOEDAS", "ASSINATURA_VIP", "DESBLOQUEIO_EPISODIO", "BONUS"
+  valor       Float     @default(0) // valor em R$ ou moedas
+  moedas      Int       @default(0)
+  descricao   String?
+  status      String    @default("CONCLUIDO") // "PENDENTE", "CONCLUIDO", "FALHOU"
+  criadoEm    DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}

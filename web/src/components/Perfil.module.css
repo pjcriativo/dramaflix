@@ -197,3 +197,68 @@
 .perigo .icone {
   color: #f87171;
 }
+
+.bannerAuth {
+  margin-top: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(90deg, rgba(236, 28, 91, 0.15), rgba(109, 40, 217, 0.15));
+  border: 1px solid rgba(236, 28, 91, 0.3);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bannerTexto strong {
+  display: block;
+  font-size: 15px;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.bannerTexto p {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.btnEntrar {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btnEntrar:hover {
+  opacity: 0.9;
+}
+
+.email {
+  font-size: 13px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.adminTag {
+  background: #ff5722 !important;
+  color: #fff !important;
+}
+
+.itemAdmin {
+  background: rgba(236, 28, 91, 0.12);
+  border: 1px solid rgba(236, 28, 91, 0.25);
+}
+
+.itemAdmin:hover {
+  background: rgba(236, 28, 91, 0.2);
+}
+
+.roxo {
+  background: rgba(147, 51, 234, 0.15);
+  color: #a855f7;
+}
