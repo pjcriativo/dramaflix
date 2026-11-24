@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "../admin.module.css";
 
+export const instant = false;
+
 interface DramaItem {
   id: string;
   numero: number;
