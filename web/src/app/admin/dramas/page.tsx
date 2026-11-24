@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "../admin.module.css";
 
@@ -26,6 +26,12 @@ interface DramaItem {
   };
 }
 
+interface UploadInfo {
+  tamanhoOriginal: string;
+  tamanhoOtimizado: string;
+  reducao: string;
+}
+
 export default function AdminDramasPage() {
   const [dramas, setDramas] = useState<DramaItem[]>([]);
   const [busca, setBusca] = useState("");
@@ -37,7 +43,7 @@ export default function AdminDramasPage() {
   // Form states
   const [formTitulo, setFormTitulo] = useState("");
   const [formId, setFormId] = useState("");
-  const [formGenero, setFormGenero] = useState("Drama");
+  const [formGenero, setFormGenero] = useState("Romance");
   const [formSinopse, setFormSinopse] = useState("");
   const [formGancho, setFormGancho] = useState("");
   const [formEpisodiosTotal, setFormEpisodiosTotal] = useState(60);
@@ -49,6 +55,17 @@ export default function AdminDramasPage() {
   const [formFoto, setFormFoto] = useState("");
   const [formBanner, setFormBanner] = useState("");
   const [formAtivo, setFormAtivo] = useState(true);
+
+  // Upload states
+  const [enviandoCapa, setEnviandoCapa] = useState(false);
+  const [enviandoBanner, setEnviandoBanner] = useState(false);
+  const [infoCapa, setInfoCapa] = useState<UploadInfo | null>(null);
+  const [infoBanner, setInfoBanner] = useState<UploadInfo | null>(null);
+  const [modoManualCapa, setModoManualCapa] = useState(false);
+  const [modoManualBanner, setModoManualBanner] = useState(false);
+
+  const inputCapaRef = useRef<HTMLInputElement>(null);
+  const inputBannerRef = useRef<HTMLInputElement>(null);
 
   const carregarDramas = async () => {
     try {
@@ -82,6 +99,10 @@ export default function AdminDramasPage() {
     setFormFoto("");
     setFormBanner("");
     setFormAtivo(true);
+    setInfoCapa(null);
+    setInfoBanner(null);
+    setModoManualCapa(false);
+    setModoManualBanner(false);
     setErro(null);
     setModalAberto(true);
   };
@@ -102,8 +123,55 @@ export default function AdminDramasPage() {
     setFormFoto(d.foto);
     setFormBanner(d.banner);
     setFormAtivo(d.ativo);
+    setInfoCapa(null);
+    setInfoBanner(null);
+    setModoManualCapa(false);
+    setModoManualBanner(false);
     setErro(null);
     setModalAberto(true);
+  };
+
+  const processarUpload = async (arquivo: File, tipo: "capa" | "banner") => {
+    if (tipo === "capa") setEnviandoCapa(true);
+    else setEnviandoBanner(true);
+
+    const formData = new FormData();
+    formData.append("file", arquivo);
+    formData.append("tipo", tipo);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        if (tipo === "capa") {
+          setFormCapa(data.url);
+          setFormFoto(data.url);
+          setInfoCapa({
+            tamanhoOriginal: data.tamanhoOriginal,
+            tamanhoOtimizado: data.tamanhoOtimizado,
+            reducao: data.reducao,
+          });
+        } else {
+          setFormBanner(data.url);
+          setInfoBanner({
+            tamanhoOriginal: data.tamanhoOriginal,
+            tamanhoOtimizado: data.tamanhoOtimizado,
+            reducao: data.reducao,
+          });
+        }
+      } else {
+        alert(data.error || "Erro ao processar imagem.");
+      }
+    } catch {
+      alert("Falha de conexão ao enviar imagem.");
+    } finally {
+      if (tipo === "capa") setEnviandoCapa(false);
+      else setEnviandoBanner(false);
+    }
   };
 
   const salvarDrama = async (e: React.FormEvent) => {
@@ -123,7 +191,7 @@ export default function AdminDramasPage() {
       classificacao: formClassificacao,
       dublado: formDublado,
       capa: formCapa || "/capas/placeholder.webp",
-      foto: formFoto || "/fotos/placeholder.webp",
+      foto: formFoto || formCapa || "/fotos/placeholder.webp",
       banner: formBanner || "/banners/placeholder.webp",
       ativo: formAtivo,
     };
@@ -184,7 +252,7 @@ export default function AdminDramasPage() {
         <div>
           <h1 className={styles.headerTitle}>Catálogo de Séries (Dramas)</h1>
           <p className={styles.headerSubtitle}>
-            Cadastre novas séries, edite metadados e gerencie os episódios disponíveis.
+            Cadastre novas séries, envie capas otimizadas em alta resolução e gerencie episódios.
           </p>
         </div>
         <button onClick={abrirNovo} className={styles.btnPrimario}>
@@ -280,11 +348,11 @@ export default function AdminDramasPage() {
         </table>
       </div>
 
-      {/* Modal de Cadastro / Edição */}
+      {/* Modal de Cadastro / Edição com Upload Otimizado Netflix-Style */}
       {modalAberto && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCaixa}>
-            <h2 style={{ fontSize: "1.3rem", fontWeight: 700, marginBottom: "16px", color: "#fff" }}>
+            <h2 style={{ fontSize: "1.35rem", fontWeight: 800, marginBottom: "16px", color: "#fff" }}>
               {dramaEditando ? "Editar Série" : "Cadastrar Nova Série"}
             </h2>
 
@@ -299,6 +367,7 @@ export default function AdminDramasPage() {
                     className={styles.input}
                     value={formTitulo}
                     onChange={(e) => setFormTitulo(e.target.value)}
+                    placeholder="Ex: Amor Proibido na Cobertura"
                     required
                   />
                 </div>
@@ -334,7 +403,7 @@ export default function AdminDramasPage() {
                     className={styles.input}
                     value={formGancho}
                     onChange={(e) => setFormGancho(e.target.value)}
-                    placeholder="Frase de impacto para a capa e destaque"
+                    placeholder="Frase de impacto que aparece na capa e no destaque"
                     required
                   />
                 </div>
@@ -345,6 +414,7 @@ export default function AdminDramasPage() {
                     className={`${styles.input} ${styles.textarea}`}
                     value={formSinopse}
                     onChange={(e) => setFormSinopse(e.target.value)}
+                    placeholder="História completa do drama..."
                     required
                   />
                 </div>
@@ -398,26 +468,222 @@ export default function AdminDramasPage() {
                   </select>
                 </div>
 
-                <div className={styles.campoGrupo}>
-                  <label>URL da Capa (3:4)</label>
+                {/* CARD DE UPLOAD DE CAPA (3:4 VERTICAL) */}
+                <div className={`${styles.uploadCard} ${styles.formFull}`}>
+                  <div className={styles.uploadCardHeader}>
+                    <span className={styles.uploadCardTitulo}>
+                      🖼️ Capa da Série (Poster Vertical)
+                    </span>
+                    <span className={styles.specBadge}>Proporção 3:4</span>
+                  </div>
+
+                  <div className={styles.specBox}>
+                    <strong>Padrão de Exibição Netflix:</strong>
+                    <ul className={styles.specList}>
+                      <li className={styles.specItem}>
+                        📐 <strong>Proporção Exata:</strong> 3:4 (Vertical)
+                      </li>
+                      <li className={styles.specItem}>
+                        📏 <strong>Resolução Recomendada:</strong> 900 × 1200 px (Mínimo: 600 × 800 px)
+                      </li>
+                      <li className={styles.specItem}>
+                        ⚡ <strong>Conversor Inteligente:</strong> Aceita imagens geradas no ChatGPT/DALL-E e comprime automaticamente para <strong>WebP ultraleve</strong> sem perder nitidez.
+                      </li>
+                    </ul>
+                  </div>
+
                   <input
-                    type="text"
-                    className={styles.input}
-                    value={formCapa}
-                    onChange={(e) => setFormCapa(e.target.value)}
-                    placeholder="/capas/exemplo.webp"
+                    type="file"
+                    ref={inputCapaRef}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        processarUpload(e.target.files[0], "capa");
+                      }
+                    }}
                   />
+
+                  {!modoManualCapa ? (
+                    <div>
+                      <div
+                        className={styles.dropzone}
+                        onClick={() => inputCapaRef.current?.click()}
+                      >
+                        <span className={styles.dropzoneTexto}>
+                          {enviandoCapa
+                            ? "⏳ Comprimindo e convertendo para WebP..."
+                            : "📤 Clique ou arraste para fazer upload da Capa"}
+                        </span>
+                        <span className={styles.dropzoneSub}>
+                          PNG, JPG ou WEBP (até 20MB) • Otimização automática
+                        </span>
+                      </div>
+
+                      {formCapa && (
+                        <div className={styles.previewContainer}>
+                          <img
+                            src={formCapa}
+                            alt="Preview Capa"
+                            className={styles.previewThumbCapa}
+                          />
+                          <div className={styles.previewInfo}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <strong style={{ fontSize: "0.85rem", color: "#fff" }}>Capa Selecionada</strong>
+                              <button
+                                type="button"
+                                onClick={() => setFormCapa("")}
+                                className={styles.btnPerigo}
+                                style={{ padding: "2px 6px", fontSize: "0.7rem" }}
+                              >
+                                Remover
+                              </button>
+                            </div>
+                            <span className={styles.previewUrl}>{formCapa}</span>
+                            {infoCapa && (
+                              <span className={styles.tagEconomia}>
+                                Otimizado: de {infoCapa.tamanhoOriginal} para {infoCapa.tamanhoOtimizado} ({infoCapa.reducao})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        className={styles.switchLink}
+                        onClick={() => setModoManualCapa(true)}
+                      >
+                        Prefere colar uma URL externa manualmente?
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        value={formCapa}
+                        onChange={(e) => setFormCapa(e.target.value)}
+                        placeholder="https://... ou /capas/exemplo.webp"
+                      />
+                      <button
+                        type="button"
+                        className={styles.switchLink}
+                        onClick={() => setModoManualCapa(false)}
+                      >
+                        ← Voltar para upload de arquivo
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                <div className={styles.campoGrupo}>
-                  <label>URL do Banner (16:9)</label>
+                {/* CARD DE UPLOAD DE BANNER (16:9 HORIZONTAL) */}
+                <div className={`${styles.uploadCard} ${styles.formFull}`}>
+                  <div className={styles.uploadCardHeader}>
+                    <span className={styles.uploadCardTitulo}>
+                      🎬 Banner de Destaque (Billboard Horizontal)
+                    </span>
+                    <span className={styles.specBadge}>Proporção 16:9</span>
+                  </div>
+
+                  <div className={styles.specBox}>
+                    <strong>Padrão de Exibição Netflix:</strong>
+                    <ul className={styles.specList}>
+                      <li className={styles.specItem}>
+                        📐 <strong>Proporção Exata:</strong> 16:9 (Horizontal / Destaque)
+                      </li>
+                      <li className={styles.specItem}>
+                        📏 <strong>Resolução Recomendada:</strong> 1920 × 1080 px (Full HD)
+                      </li>
+                      <li className={styles.specItem}>
+                        ⚡ <strong>Conversor Inteligente:</strong> Comprime automaticamente imagens pesadas de IA para <strong>WebP Full HD</strong> de carregamento instantâneo.
+                      </li>
+                    </ul>
+                  </div>
+
                   <input
-                    type="text"
-                    className={styles.input}
-                    value={formBanner}
-                    onChange={(e) => setFormBanner(e.target.value)}
-                    placeholder="/banners/exemplo.webp"
+                    type="file"
+                    ref={inputBannerRef}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        processarUpload(e.target.files[0], "banner");
+                      }
+                    }}
                   />
+
+                  {!modoManualBanner ? (
+                    <div>
+                      <div
+                        className={styles.dropzone}
+                        onClick={() => inputBannerRef.current?.click()}
+                      >
+                        <span className={styles.dropzoneTexto}>
+                          {enviandoBanner
+                            ? "⏳ Comprimindo e convertendo para WebP..."
+                            : "📤 Clique ou arraste para fazer upload do Banner"}
+                        </span>
+                        <span className={styles.dropzoneSub}>
+                          PNG, JPG ou WEBP (até 20MB) • Otimização automática
+                        </span>
+                      </div>
+
+                      {formBanner && (
+                        <div className={styles.previewContainer}>
+                          <img
+                            src={formBanner}
+                            alt="Preview Banner"
+                            className={styles.previewThumbBanner}
+                          />
+                          <div className={styles.previewInfo}>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                              <strong style={{ fontSize: "0.85rem", color: "#fff" }}>Banner Selecionado</strong>
+                              <button
+                                type="button"
+                                onClick={() => setFormBanner("")}
+                                className={styles.btnPerigo}
+                                style={{ padding: "2px 6px", fontSize: "0.7rem" }}
+                              >
+                                Remover
+                              </button>
+                            </div>
+                            <span className={styles.previewUrl}>{formBanner}</span>
+                            {infoBanner && (
+                              <span className={styles.tagEconomia}>
+                                Otimizado: de {infoBanner.tamanhoOriginal} para {infoBanner.tamanhoOtimizado} ({infoBanner.reducao})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        className={styles.switchLink}
+                        onClick={() => setModoManualBanner(true)}
+                      >
+                        Prefere colar uma URL externa manualmente?
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        value={formBanner}
+                        onChange={(e) => setFormBanner(e.target.value)}
+                        placeholder="https://... ou /banners/exemplo.webp"
+                      />
+                      <button
+                        type="button"
+                        className={styles.switchLink}
+                        onClick={() => setModoManualBanner(false)}
+                      >
+                        ← Voltar para upload de arquivo
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className={`${styles.campoGrupo} ${styles.formFull}`} style={{ flexDirection: "row", gap: "20px" }}>
@@ -446,14 +712,14 @@ export default function AdminDramasPage() {
                   type="button"
                   className={styles.btnSecundario}
                   onClick={() => setModalAberto(false)}
-                  disabled={salvando}
+                  disabled={salvando || enviandoCapa || enviandoBanner}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   className={styles.btnPrimario}
-                  disabled={salvando}
+                  disabled={salvando || enviandoCapa || enviandoBanner}
                 >
                   {salvando ? "Salvando..." : "Salvar Série"}
                 </button>

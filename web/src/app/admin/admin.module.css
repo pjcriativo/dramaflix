@@ -320,7 +320,7 @@
   border: 1px solid #2e2e2e;
   border-radius: 14px;
   width: 100%;
-  max-width: 650px;
+  max-width: 780px;
   max-height: 90vh;
   overflow-y: auto;
   padding: 28px;
@@ -375,4 +375,171 @@
   margin-top: 24px;
   border-top: 1px solid #2a2a2a;
   padding-top: 16px;
+}
+
+/* Área de Upload e Otimização Netflix-Style */
+.uploadCard {
+  background: #131313;
+  border: 1px solid #282828;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uploadCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.uploadCardTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.specBadge {
+  background: rgba(236, 28, 91, 0.15);
+  color: #ff6b8b;
+  border: 1px solid rgba(236, 28, 91, 0.3);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.specBox {
+  background: #1a1a1a;
+  border-left: 3px solid var(--cor-marca, #ec1c5b);
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #cccccc;
+}
+
+.specList {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.specItem {
+  color: #aaaaaa;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.specItem strong {
+  color: #ffffff;
+}
+
+.dropzone {
+  border: 2px dashed #3a3a3a;
+  border-radius: 8px;
+  padding: 18px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #0f0f0f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dropzone:hover {
+  border-color: var(--cor-marca, #ec1c5b);
+  background: rgba(236, 28, 91, 0.05);
+}
+
+.dropzoneTexto {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #dddddd;
+}
+
+.dropzoneSub {
+  font-size: 0.75rem;
+  color: #888888;
+}
+
+.previewContainer {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: #181818;
+  border: 1px solid #2a2a2a;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.previewThumbCapa {
+  width: 54px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.previewThumbBanner {
+  width: 100px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.previewInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.previewUrl {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: #888;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tagEconomia {
+  display: inline-block;
+  background: rgba(34, 197, 94, 0.18);
+  color: #4ade80;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.switchLink {
+  background: none;
+  border: none;
+  color: #777;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.switchLink:hover {
+  color: #aaa;
 }

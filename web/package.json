@@ -18,7 +18,8 @@
     "jose": "^6.2.18",
     "next": "16.4.6",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@iconify-json/ph": "^1.2.2",
