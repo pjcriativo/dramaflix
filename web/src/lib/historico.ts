@@ -27,6 +27,19 @@ export function salvarPosicao(id: string, ep: number, t: number, dur: number) {
   const terminou = t >= dur - 1;
   const ponto: PontoVisto = terminou && ep < total ? { ep: ep + 1, t: 0, dur: 0, quando: Date.now() } : { ep, t: Math.max(0, t), dur, quando: Date.now() };
   historico.gravar({ ...historico.ler(), [id]: ponto });
+
+  // Sincroniza em segundo plano com o banco de dados
+  if (typeof window !== "undefined") {
+    fetch("/api/usuario/historico", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dramaId: id,
+        numeroEpisodio: ponto.ep,
+        segundos: ponto.t,
+      }),
+    }).catch(() => {});
+  }
 }
 
 /** Onde a pessoa parou num drama (só o que ela assistiu de verdade neste navegador). */

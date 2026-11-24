@@ -55,8 +55,7 @@ export async function getSessionUser() {
     });
 
     return user;
-  } catch (error) {
-    console.error("Erro ao obter sessão:", error);
+  } catch {
     return null;
   }
 }

@@ -70,7 +70,27 @@ export function Player({ id }: { id: string }) {
   const epUrl = Number(params.get("ep"));
   const ep = Number.isInteger(epUrl) && epUrl >= 1 && epUrl <= d.episodios ? epUrl : 1;
   const acesso = temAcesso(carteira, d, ep);
-  const { src, amostra, emBreve } = videoDoEpisodio(d.id, ep);
+  const { src: srcPadrao, amostra: amostraPadrao, emBreve: emBrevePadrao } = videoDoEpisodio(d.id, ep);
+  const [srcDinamico, setSrcDinamico] = useState<string | null>(null);
+
+  useEffect(() => {
+    let montado = true;
+    fetch(`/api/episodio?dramaId=${d.id}&ep=${ep}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (montado && data.encontrado && data.episodio?.videoUrl) {
+          setSrcDinamico(data.episodio.videoUrl);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      montado = false;
+    };
+  }, [d.id, ep]);
+
+  const src = srcDinamico || srcPadrao;
+  const amostra = srcDinamico ? false : amostraPadrao;
+  const emBreve = srcDinamico ? false : emBrevePadrao;
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const quadroRef = useRef<HTMLDivElement>(null);
