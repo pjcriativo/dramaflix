@@ -16,6 +16,9 @@ interface DramaItem {
   moedasPorEpisodio: number;
   classificacao: string;
   dublado: boolean;
+  idiomaAudio?: string;
+  legendado?: boolean;
+  idiomasLegenda?: string;
   capa: string;
   foto: string;
   banner: string;
@@ -31,6 +34,15 @@ interface UploadInfo {
   tamanhoOtimizado: string;
   reducao: string;
 }
+
+const IDIOMAS_DISPONIVEIS = [
+  { sigla: "pt-BR", nome: "Português (Brasil)" },
+  { sigla: "zh", nome: "Mandarim / Chinês" },
+  { sigla: "ko", nome: "Coreano" },
+  { sigla: "en", nome: "Inglês" },
+  { sigla: "es", nome: "Espanhol" },
+  { sigla: "ja", nome: "Japonês" },
+];
 
 export default function AdminDramasPage() {
   const [dramas, setDramas] = useState<DramaItem[]>([]);
@@ -51,6 +63,9 @@ export default function AdminDramasPage() {
   const [formMoedasPorEp, setFormMoedasPorEp] = useState(40);
   const [formClassificacao, setFormClassificacao] = useState("A14");
   const [formDublado, setFormDublado] = useState(false);
+  const [formIdiomaAudio, setFormIdiomaAudio] = useState("pt-BR");
+  const [formLegendado, setFormLegendado] = useState(true);
+  const [formIdiomasLegenda, setFormIdiomasLegenda] = useState<string[]>(["pt-BR"]);
   const [formCapa, setFormCapa] = useState("");
   const [formFoto, setFormFoto] = useState("");
   const [formBanner, setFormBanner] = useState("");
@@ -83,6 +98,12 @@ export default function AdminDramasPage() {
     carregarDramas();
   }, []);
 
+  const alternarIdiomaLegenda = (sigla: string) => {
+    setFormIdiomasLegenda((atuais) =>
+      atuais.includes(sigla) ? atuais.filter((s) => s !== sigla) : [...atuais, sigla]
+    );
+  };
+
   const abrirNovo = () => {
     setDramaEditando(null);
     setFormTitulo("");
@@ -95,6 +116,9 @@ export default function AdminDramasPage() {
     setFormMoedasPorEp(40);
     setFormClassificacao("A14");
     setFormDublado(false);
+    setFormIdiomaAudio("pt-BR");
+    setFormLegendado(true);
+    setFormIdiomasLegenda(["pt-BR"]);
     setFormCapa("");
     setFormFoto("");
     setFormBanner("");
@@ -119,6 +143,9 @@ export default function AdminDramasPage() {
     setFormMoedasPorEp(d.moedasPorEpisodio);
     setFormClassificacao(d.classificacao);
     setFormDublado(d.dublado);
+    setFormIdiomaAudio(d.idiomaAudio || "pt-BR");
+    setFormLegendado(d.legendado !== undefined ? d.legendado : true);
+    setFormIdiomasLegenda(d.idiomasLegenda ? d.idiomasLegenda.split(",") : ["pt-BR"]);
     setFormCapa(d.capa);
     setFormFoto(d.foto);
     setFormBanner(d.banner);
@@ -190,6 +217,9 @@ export default function AdminDramasPage() {
       moedasPorEpisodio: formMoedasPorEp,
       classificacao: formClassificacao,
       dublado: formDublado,
+      idiomaAudio: formIdiomaAudio,
+      legendado: formLegendado,
+      idiomasLegenda: formIdiomasLegenda.join(","),
       capa: formCapa || "/capas/placeholder.webp",
       foto: formFoto || formCapa || "/fotos/placeholder.webp",
       banner: formBanner || "/banners/placeholder.webp",
@@ -278,8 +308,8 @@ export default function AdminDramasPage() {
               <th>Capa</th>
               <th>Título / Slug</th>
               <th>Gênero</th>
+              <th>Áudio & Legendas</th>
               <th>Eps Cadastrados</th>
-              <th>Grátis Até</th>
               <th>Preço Ep</th>
               <th>Status</th>
               <th>Ações</th>
@@ -305,9 +335,26 @@ export default function AdminDramasPage() {
                 </td>
                 <td>{d.genero}</td>
                 <td>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                    {d.dublado ? (
+                      <span className={`${styles.badgeNetflix} ${styles.badgeNetflixDublado}`} style={{ width: "fit-content" }}>
+                        🎙️ DUBLADO
+                      </span>
+                    ) : (
+                      <span className={styles.badgeNetflix} style={{ width: "fit-content" }}>
+                        ÁUDIO: {d.idiomaAudio ? d.idiomaAudio.toUpperCase() : "ORIGINAL"}
+                      </span>
+                    )}
+                    {d.legendado && (
+                      <span className={`${styles.badgeNetflix} ${styles.badgeNetflixLegenda}`} style={{ width: "fit-content" }}>
+                        💬 LEG: {d.idiomasLegenda ? d.idiomasLegenda.toUpperCase() : "PT-BR"}
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td>
                   <strong>{d._count?.episodios ?? d.episodiosTotal}</strong> / {d.episodiosTotal}
                 </td>
-                <td>Ep. {d.gratisAte}</td>
                 <td>{d.moedasPorEpisodio} moedas</td>
                 <td>
                   <span
@@ -348,7 +395,7 @@ export default function AdminDramasPage() {
         </table>
       </div>
 
-      {/* Modal de Cadastro / Edição com Upload Otimizado Netflix-Style */}
+      {/* Modal de Cadastro / Edição */}
       {modalAberto && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalCaixa}>
@@ -468,6 +515,112 @@ export default function AdminDramasPage() {
                   </select>
                 </div>
 
+                {/* CARD DE ÁUDIO, DUBLAGEM E LEGENDAS (ESTILO NETFLIX) */}
+                <div className={`${styles.audioCard} ${styles.formFull}`}>
+                  <div className={styles.uploadCardHeader}>
+                    <span className={styles.uploadCardTitulo}>
+                      🎙️ Áudio, Dublagem e Legendas
+                    </span>
+                    <span className={styles.specBadge}>Padrão Netflix</span>
+                  </div>
+
+                  <div className={styles.audioGrid}>
+                    {/* ÁUDIO & DUBLAGEM */}
+                    <div className={styles.audioSubsecao}>
+                      <span className={styles.audioSubsecaoTitulo}>🔊 Faixa de Áudio</span>
+
+                      <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.9rem" }}>
+                        <input
+                          type="checkbox"
+                          checked={formDublado}
+                          onChange={(e) => setFormDublado(e.target.checked)}
+                        />
+                        <span>Possui Dublagem em Português (PT-BR)</span>
+                      </label>
+
+                      <div style={{ marginTop: "6px" }}>
+                        <label style={{ fontSize: "0.8rem", color: "#aaa", display: "block", marginBottom: "4px" }}>
+                          Idioma Principal do Áudio:
+                        </label>
+                        <select
+                          className={styles.input}
+                          value={formIdiomaAudio}
+                          onChange={(e) => setFormIdiomaAudio(e.target.value)}
+                        >
+                          {IDIOMAS_DISPONIVEIS.map((i) => (
+                            <option key={i.sigla} value={i.sigla}>
+                              {i.nome}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* LEGENDAS */}
+                    <div className={styles.audioSubsecao}>
+                      <span className={styles.audioSubsecaoTitulo}>💬 Opções de Legenda</span>
+
+                      <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.9rem" }}>
+                        <input
+                          type="checkbox"
+                          checked={formLegendado}
+                          onChange={(e) => setFormLegendado(e.target.checked)}
+                        />
+                        <span>Série Legendada</span>
+                      </label>
+
+                      {formLegendado && (
+                        <div style={{ marginTop: "6px" }}>
+                          <label style={{ fontSize: "0.8rem", color: "#aaa", display: "block", marginBottom: "4px" }}>
+                            Legendas Disponíveis (clique para ativar):
+                          </label>
+                          <div className={styles.tagsLegendaContainer}>
+                            {[
+                              { sigla: "pt-BR", nome: "Português (PT)" },
+                              { sigla: "en", nome: "Inglês (EN)" },
+                              { sigla: "es", nome: "Espanhol (ES)" },
+                              { sigla: "zh", nome: "Chinês (ZH)" },
+                              { sigla: "ko", nome: "Coreano (KO)" },
+                            ].map(({ sigla, nome }) => {
+                              const ativa = formIdiomasLegenda.includes(sigla);
+                              return (
+                                <button
+                                  key={sigla}
+                                  type="button"
+                                  className={`${styles.tagLegendaBotao} ${ativa ? styles.tagLegendaAtiva : ""}`}
+                                  onClick={() => alternarIdiomaLegenda(sigla)}
+                                >
+                                  {ativa ? "✓ " : "+ "} {nome}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* PRÉVIA DOS SELOS DE EXIBIÇÃO NO APP */}
+                  <div className={styles.previewBadgeArea}>
+                    <span>Prévia dos selos na plataforma:</span>
+                    {formDublado && (
+                      <span className={`${styles.badgeNetflix} ${styles.badgeNetflixDublado}`}>
+                        🎙️ DUBLADO PT-BR
+                      </span>
+                    )}
+                    {formLegendado && formIdiomasLegenda.length > 0 && (
+                      <span className={`${styles.badgeNetflix} ${styles.badgeNetflixLegenda}`}>
+                        💬 LEG: {formIdiomasLegenda.map((s) => s.split("-")[0].toUpperCase()).join(" · ")}
+                      </span>
+                    )}
+                    {!formDublado && (
+                      <span className={styles.badgeNetflix}>
+                        ÁUDIO: {formIdiomaAudio.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
                 {/* CARD DE UPLOAD DE CAPA (3:4 VERTICAL) */}
                 <div className={`${styles.uploadCard} ${styles.formFull}`}>
                   <div className={styles.uploadCardHeader}>
@@ -487,7 +640,7 @@ export default function AdminDramasPage() {
                         📏 <strong>Resolução Recomendada:</strong> 900 × 1200 px (Mínimo: 600 × 800 px)
                       </li>
                       <li className={styles.specItem}>
-                        ⚡ <strong>Conversor Inteligente:</strong> Aceita imagens geradas no ChatGPT/DALL-E e comprime automaticamente para <strong>WebP ultraleve</strong> sem perder nitidez.
+                        ⚡ <strong>Conversor Inteligente:</strong> Ao selecionar a imagem, o sistema converte direto para <strong>WebP ultraleve</strong> sem você precisar de nenhum app externo.
                       </li>
                     </ul>
                   </div>
@@ -516,7 +669,7 @@ export default function AdminDramasPage() {
                             : "📤 Clique ou arraste para fazer upload da Capa"}
                         </span>
                         <span className={styles.dropzoneSub}>
-                          PNG, JPG ou WEBP (até 20MB) • Otimização automática
+                          PNG, JPG ou WEBP (até 20MB) • Conversão e compressão direta na plataforma
                         </span>
                       </div>
 
@@ -529,7 +682,7 @@ export default function AdminDramasPage() {
                           />
                           <div className={styles.previewInfo}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <strong style={{ fontSize: "0.85rem", color: "#fff" }}>Capa Selecionada</strong>
+                              <strong style={{ fontSize: "0.85rem", color: "#fff" }}>Capa Otimizada Pronta</strong>
                               <button
                                 type="button"
                                 onClick={() => setFormCapa("")}
@@ -542,7 +695,7 @@ export default function AdminDramasPage() {
                             <span className={styles.previewUrl}>{formCapa}</span>
                             {infoCapa && (
                               <span className={styles.tagEconomia}>
-                                Otimizado: de {infoCapa.tamanhoOriginal} para {infoCapa.tamanhoOtimizado} ({infoCapa.reducao})
+                                ⚡ Otimizado no servidor: de {infoCapa.tamanhoOriginal} para {infoCapa.tamanhoOtimizado} ({infoCapa.reducao})
                               </span>
                             )}
                           </div>
@@ -596,7 +749,7 @@ export default function AdminDramasPage() {
                         📏 <strong>Resolução Recomendada:</strong> 1920 × 1080 px (Full HD)
                       </li>
                       <li className={styles.specItem}>
-                        ⚡ <strong>Conversor Inteligente:</strong> Comprime automaticamente imagens pesadas de IA para <strong>WebP Full HD</strong> de carregamento instantâneo.
+                        ⚡ <strong>Conversor Inteligente:</strong> Aceita imagens pesadas de IA e converte direto para <strong>WebP Full HD</strong> de alta definição.
                       </li>
                     </ul>
                   </div>
@@ -625,7 +778,7 @@ export default function AdminDramasPage() {
                             : "📤 Clique ou arraste para fazer upload do Banner"}
                         </span>
                         <span className={styles.dropzoneSub}>
-                          PNG, JPG ou WEBP (até 20MB) • Otimização automática
+                          PNG, JPG ou WEBP (até 20MB) • Conversão e compressão direta na plataforma
                         </span>
                       </div>
 
@@ -638,7 +791,7 @@ export default function AdminDramasPage() {
                           />
                           <div className={styles.previewInfo}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                              <strong style={{ fontSize: "0.85rem", color: "#fff" }}>Banner Selecionado</strong>
+                              <strong style={{ fontSize: "0.85rem", color: "#fff" }}>Banner Otimizado Pronto</strong>
                               <button
                                 type="button"
                                 onClick={() => setFormBanner("")}
@@ -651,7 +804,7 @@ export default function AdminDramasPage() {
                             <span className={styles.previewUrl}>{formBanner}</span>
                             {infoBanner && (
                               <span className={styles.tagEconomia}>
-                                Otimizado: de {infoBanner.tamanhoOriginal} para {infoBanner.tamanhoOtimizado} ({infoBanner.reducao})
+                                ⚡ Otimizado no servidor: de {infoBanner.tamanhoOriginal} para {infoBanner.tamanhoOtimizado} ({infoBanner.reducao})
                               </span>
                             )}
                           </div>
@@ -687,15 +840,6 @@ export default function AdminDramasPage() {
                 </div>
 
                 <div className={`${styles.campoGrupo} ${styles.formFull}`} style={{ flexDirection: "row", gap: "20px" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-                    <input
-                      type="checkbox"
-                      checked={formDublado}
-                      onChange={(e) => setFormDublado(e.target.checked)}
-                    />
-                    Dublado
-                  </label>
-
                   <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                     <input
                       type="checkbox"

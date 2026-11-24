@@ -543,3 +543,114 @@
 .switchLink:hover {
   color: #aaa;
 }
+
+/* Áudio, Dublagem e Legendas */
+.audioCard {
+  background: #141414;
+  border: 1px solid #282828;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.audioGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .audioGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.audioSubsecao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.audioSubsecaoTitulo {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tagsLegendaContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tagLegendaBotao {
+  background: #202020;
+  border: 1px solid #333333;
+  color: #aaaaaa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tagLegendaBotao:hover {
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
+.tagLegendaAtiva {
+  background: rgba(236, 28, 91, 0.2);
+  border-color: var(--cor-marca, #ec1c5b);
+  color: #ffffff;
+}
+
+.previewBadgeArea {
+  background: #181818;
+  border-top: 1px solid #242424;
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.badgeNetflix {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid #444;
+  background: #222;
+  color: #fff;
+}
+
+.badgeNetflixDublado {
+  border-color: rgba(236, 28, 91, 0.5);
+  background: rgba(236, 28, 91, 0.15);
+  color: #ff6b8b;
+}
+
+.badgeNetflixLegenda {
+  border-color: rgba(59, 130, 246, 0.5);
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}

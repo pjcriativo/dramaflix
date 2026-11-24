@@ -43,6 +43,9 @@ model Drama {
   classificacao     String    @default("A14") // L, A10, A12, A14, A16, A18
   selo              String?   // novo, exclusivo, dublado, completo
   dublado           Boolean   @default(false)
+  idiomaAudio       String    @default("pt-BR") // pt-BR, zh, ko, en, es, ja
+  legendado         Boolean   @default(true)
+  idiomasLegenda    String    @default("pt-BR") // ex: "pt-BR,en,es"
   emAlta            Int       @default(0)
   capa              String    // ex: "/capas/01-ele-me-trocou.webp"
   foto              String    // ex: "/fotos/01-ele-me-trocou.webp"
